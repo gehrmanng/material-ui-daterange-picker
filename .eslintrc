@@ -1,1 +1,12 @@
-{ "extends": "react-app" }
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "env": {
+      "node": true,
+      "es6": true,
+      "browser": true
+  },
+  "rules": {
+      "react/forbid-prop-types": "off"
+  }
+}

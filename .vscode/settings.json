@@ -1,0 +1,9 @@
+{
+  "eslint.alwaysShowStatus": true,
+  "eslint.autoFixOnSave": true,
+  "editor.formatOnSave": true,
+  "prettier.eslintIntegration": true,
+  "files.associations": {
+    "*.js": "javascriptreact"
+  }
+}

@@ -1,12 +1,21 @@
 import React from 'react';
-import { render } from "react-dom";
-import { TextInput } from "./lib";
+import { render } from 'react-dom';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import moment from 'moment';
+import 'moment/locale/de';
 
-const App = () => (
-  <div style={{ width: 640, margin: "15px auto" }}>
-    <h1>Hello React</h1>
-    <TextInput label="Email Address" placeholder="name@example.com" />
-  </div>
-);
+import Picker from './lib';
 
-render(<App />, document.getElementById("root"));
+const App = () => {
+  moment.locale(window.navigator.language);
+
+  return (
+    <div style={{ width: '80%', margin: '0 auto' }}>
+      <CssBaseline />
+      <h1>Material UI DateRange Picker</h1>
+      <Picker autoSubmit={false} />
+    </div>
+  );
+};
+
+render(<App />, document.getElementById('root'));
