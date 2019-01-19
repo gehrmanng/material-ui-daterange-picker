@@ -147,7 +147,7 @@ class Calendar extends Component {
       classes, dateRanges, buildDayTooltip, getHighlightColor,
     } = this.props;
 
-    return Array.from(visibleRange.by('month')).map((m) => {
+    return Array.from(visibleRange.by('month')).map((m, index) => {
       const monthEnd = moment(m).endOf('month');
       const monthRange = moment.range(m, monthEnd);
       const ranges = dateRanges.filter(r => monthRange.overlaps(r));
@@ -173,10 +173,12 @@ class Calendar extends Component {
             showLeftArrow={
               type === CALENDAR_TYPE.MONTH
               && (!absoluteStartDate || absoluteStartDate.isBefore(visibleRange.start))
+              && index === 0
             }
             showRightArrow={
               type === CALENDAR_TYPE.MONTH
               && (!absoluteEndDate || absoluteEndDate.isAfter(visibleRange.end))
+              && index === displayMonths - 1
             }
           />
         </Grid>

@@ -127,6 +127,7 @@ class Month extends Component {
     const hidden = !day.isSame(date, 'month');
     const hightlightColor = getHighlightColor(day.format('YYYY-MM-DD'));
     let highlighted = HIGHLIGHT_TYPE.NONE;
+
     if (range) {
       const firstInRange = range && range.start.isSame(day, 'day');
       const lastInRange = range && range.end.isSame(day, 'day');

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import {
-  TextField, Popover, Toolbar, Typography,
+  TextField, Popover, Toolbar, Typography, DialogActions, Button,
 } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 
@@ -41,7 +41,6 @@ const styles = theme => ({
 
 class Picker extends PureComponent {
   static propTypes = {
-    date: PropTypes.instanceOf(moment),
     onSelect: PropTypes.func,
     classes: PropTypes.object.isRequired,
     variant: PropTypes.oneOf(['inline', 'picker', 'range-picker']),
@@ -49,14 +48,14 @@ class Picker extends PureComponent {
   };
 
   static defaultProps = {
-    date: moment(),
     onSelect: () => {},
     variant: 'inline',
     autoSubmit: false,
   };
 
   state = {
-    date: moment(),
+    internalDate: moment().startOf('day'),
+    textValue: '',
     anchorEl: null,
   };
 
@@ -65,7 +64,7 @@ class Picker extends PureComponent {
     const { value } = target;
 
     this.setState({
-      date: value,
+      textValue: value,
     });
   };
 
@@ -73,37 +72,51 @@ class Picker extends PureComponent {
     const { autoSubmit } = this.props;
     this.setState(prevState => ({
       ...prevState,
-      date,
+      internalDate: date,
+      textValue: autoSubmit ? date.format('L') : prevState.textValue,
       anchorEl: autoSubmit ? null : prevState.anchorEl,
     }));
   };
 
   handleClickTextfield = (event) => {
-    this.setState({
-      anchorEl: event.currentTarget,
-    });
+    const { currentTarget } = event;
+    const { value } = currentTarget;
+
+    this.setState(prevState => ({
+      internalDate: value ? moment(value, 'L') : prevState.internalDate,
+      anchorEl: currentTarget,
+    }));
   };
 
   handleClose = () => {
     this.setState({
+      internalDate: moment().startOf('day'),
+      anchorEl: null,
+    });
+  };
+
+  handleConfirmButton = () => {
+    const { internalDate } = this.state;
+    this.setState({
+      textValue: internalDate.format('L'),
       anchorEl: null,
     });
   };
 
   render() {
-    const { date, anchorEl } = this.state;
-    const { classes } = this.props;
-    const open = Boolean(anchorEl);
+    const { textValue, internalDate, anchorEl } = this.state;
+    const { autoSubmit, classes } = this.props;
 
-    const formattedDate = date.format('L');
-    const range = [moment.range(date, date)];
+    const open = Boolean(anchorEl);
+    const range = [moment.range(internalDate, internalDate)];
+
     return (
       <>
         <TextField
           id="date-picker"
           label="Date"
           className={classes.textField}
-          value={formattedDate}
+          value={textValue}
           onChange={this.handleChange}
           margin="normal"
           onClick={this.handleClickTextfield}
@@ -124,20 +137,31 @@ class Picker extends PureComponent {
         >
           <Toolbar classes={{ root: classes.pickerToolbar }}>
             <Typography variant="subtitle1" className={classes.year}>
-              {date.format('YYYY')}
+              {internalDate.format('YYYY')}
             </Typography>
             <Typography variant="h4" className={classes.date}>
-              {date.format('ddd, MMM DD')}
+              {internalDate.format('ddd, MMM DD')}
             </Typography>
           </Toolbar>
           <div className={classes.calendar}>
             <Calendar
-              date={date}
+              date={internalDate}
               dateRanges={range}
               className={classes.pickerCalendar}
               onSelect={this.handleDateSelection}
+              displayMonths={1}
             />
           </div>
+          {!autoSubmit && (
+            <DialogActions>
+              <Button onClick={this.handleClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={this.handleConfirmButton} color="primary">
+                OK
+              </Button>
+            </DialogActions>
+          )}
         </Popover>
       </>
     );
