@@ -3,12 +3,10 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
-import {
-  TextField, Popover, Toolbar, Typography, DialogActions, Button,
-} from '@material-ui/core';
+import { TextField } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 
-import Calendar from './Calendar';
+import PickerPopover from './PickerPopover';
 
 const moment = extendMoment(Moment);
 
@@ -49,12 +47,11 @@ class Picker extends PureComponent {
 
   static defaultProps = {
     onSelect: () => {},
-    variant: 'inline',
+    variant: 'picker',
     autoSubmit: false,
   };
 
   state = {
-    internalDate: moment().startOf('day'),
     textValue: '',
     anchorEl: null,
   };
@@ -68,47 +65,32 @@ class Picker extends PureComponent {
     });
   };
 
-  handleDateSelection = (date) => {
-    const { autoSubmit } = this.props;
-    this.setState(prevState => ({
-      ...prevState,
-      internalDate: date,
-      textValue: autoSubmit ? date.format('L') : prevState.textValue,
-      anchorEl: autoSubmit ? null : prevState.anchorEl,
-    }));
-  };
-
   handleClickTextfield = (event) => {
     const { currentTarget } = event;
-    const { value } = currentTarget;
 
-    this.setState(prevState => ({
-      internalDate: value ? moment(value, 'L') : prevState.internalDate,
+    this.setState({
       anchorEl: currentTarget,
-    }));
+    });
   };
 
   handleClose = () => {
     this.setState({
-      internalDate: moment().startOf('day'),
       anchorEl: null,
     });
   };
 
-  handleConfirmButton = () => {
-    const { internalDate } = this.state;
+  handleConfirm = (newDate) => {
     this.setState({
-      textValue: internalDate.format('L'),
+      textValue: newDate.format('L'),
       anchorEl: null,
     });
   };
 
   render() {
-    const { textValue, internalDate, anchorEl } = this.state;
-    const { autoSubmit, classes } = this.props;
+    const { textValue, anchorEl } = this.state;
+    const { variant, autoSubmit, classes } = this.props;
 
-    const open = Boolean(anchorEl);
-    const range = [moment.range(internalDate, internalDate)];
+    const dateValue = textValue ? moment(textValue, 'L') : null;
 
     return (
       <>
@@ -121,48 +103,14 @@ class Picker extends PureComponent {
           margin="normal"
           onClick={this.handleClickTextfield}
         />
-        <Popover
-          id="simple-popper"
-          open={open}
+        <PickerPopover
           anchorEl={anchorEl}
           onClose={this.handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          <Toolbar classes={{ root: classes.pickerToolbar }}>
-            <Typography variant="subtitle1" className={classes.year}>
-              {internalDate.format('YYYY')}
-            </Typography>
-            <Typography variant="h4" className={classes.date}>
-              {internalDate.format('ddd, MMM DD')}
-            </Typography>
-          </Toolbar>
-          <div className={classes.calendar}>
-            <Calendar
-              date={internalDate}
-              dateRanges={range}
-              className={classes.pickerCalendar}
-              onSelect={this.handleDateSelection}
-              displayMonths={1}
-            />
-          </div>
-          {!autoSubmit && (
-            <DialogActions>
-              <Button onClick={this.handleClose} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={this.handleConfirmButton} color="primary">
-                OK
-              </Button>
-            </DialogActions>
-          )}
-        </Popover>
+          onSubmit={this.handleConfirm}
+          autoSubmit={autoSubmit}
+          value={dateValue}
+          variant={variant}
+        />
       </>
     );
   }
