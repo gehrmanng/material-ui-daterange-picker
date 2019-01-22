@@ -1,3 +1,4 @@
+// Library imports
 import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -6,8 +7,10 @@ import { extendMoment } from 'moment-range';
 import { TextField } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 
+// Local component imports
 import PickerPopover from './PickerPopover';
 
+// Init moment-range
 const moment = extendMoment(Moment);
 
 /**
@@ -37,7 +40,13 @@ const styles = theme => ({
   },
 });
 
+/**
+ * Component class for date and date range picker.
+ *
+ * @extends React.PureComponent
+ */
 class Picker extends PureComponent {
+  // Set component property types.
   static propTypes = {
     onSelect: PropTypes.func,
     classes: PropTypes.object.isRequired,
@@ -45,17 +54,25 @@ class Picker extends PureComponent {
     autoSubmit: PropTypes.bool,
   };
 
+  // Set default property values
   static defaultProps = {
     onSelect: () => {},
     variant: 'picker',
     autoSubmit: false,
   };
 
+  // Initialise component state
   state = {
     textValue: '',
     anchorEl: null,
   };
 
+  /**
+   * Change handler for date text field. Sets the
+   * component state to the new input value.
+   *
+   * @param {object} event - The change event
+   */
   handleChange = (event) => {
     const { target } = event;
     const { value } = target;
@@ -65,6 +82,12 @@ class Picker extends PureComponent {
     });
   };
 
+  /**
+   * Click handler that is called when the date text field
+   * is clicked. Opens the calendar popover.
+   *
+   * @param {object} event - The click event
+   */
   handleClickTextfield = (event) => {
     const { currentTarget } = event;
 
@@ -73,12 +96,21 @@ class Picker extends PureComponent {
     });
   };
 
+  /**
+   * Close the calendar popover.
+   */
   handleClose = () => {
     this.setState({
       anchorEl: null,
     });
   };
 
+  /**
+   * Handle the selection of a new date. Either by clicking the
+   * OK button or by autosubmit. Also closes the popover.
+   *
+   * @param {moment} newDate - The selected date
+   */
   handleConfirm = (newDate) => {
     this.setState({
       textValue: newDate.format('L'),
@@ -86,6 +118,11 @@ class Picker extends PureComponent {
     });
   };
 
+  /**
+   * Render this component.
+   *
+   * @return {jsx} The component markup
+   */
   render() {
     const { textValue, anchorEl } = this.state;
     const { variant, autoSubmit, classes } = this.props;
@@ -116,4 +153,5 @@ class Picker extends PureComponent {
   }
 }
 
+// Export this component as default
 export default withStyles(styles, { withTheme: true })(Picker);

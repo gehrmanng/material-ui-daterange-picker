@@ -1,11 +1,14 @@
+// Library imports
 import React from 'react';
 import { render } from 'react-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import moment from 'moment';
 import 'moment/locale/de';
 
+// Local lib imports
 import Picker from './lib';
 
+// Example application
 const App = () => {
   moment.locale(window.navigator.language);
 
@@ -18,4 +21,5 @@ const App = () => {
   );
 };
 
+// Render the example application
 render(<App />, document.getElementById('root'));

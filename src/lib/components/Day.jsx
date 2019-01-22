@@ -6,6 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
 
+// Export a helper constant with allowed day highlight types
 export const HIGHLIGHT_TYPE = {
   NONE: false,
   IN_RANGE: 'inRange',
@@ -73,12 +74,12 @@ const styles = theme => ({
 });
 
 /**
- * A functional component that creates a calendar day.
+ * A component class that creates a calendar day.
  *
- * @param {object} props - The component properties
- * @return {jsx} The component markup
+ * @extends React.Component
  */
 class Day extends React.Component {
+  // Set component property types.
   static propTypes = {
     date: PropTypes.instanceOf(moment).isRequired,
     hidden: PropTypes.bool,
@@ -86,6 +87,7 @@ class Day extends React.Component {
     highlightColor: PropTypes.string,
     tooltip: PropTypes.node,
     classes: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired,
     onSelectDay: PropTypes.func.isRequired,
   };
 
@@ -97,6 +99,14 @@ class Day extends React.Component {
     tooltip: undefined,
   };
 
+  /**
+   * Check if the component should be rerendered by comparing
+   * the current properties with the next properties.
+   *
+   * @param {object} nextProps - The next property values
+   * @return {boolean} True if the current and next properties are different
+   *                   thus the component should be rerendered. False otherwise.
+   */
   shouldComponentUpdate(nextProps) {
     const {
       date, hidden, highlighted, highlightColor, tooltip,
@@ -110,6 +120,11 @@ class Day extends React.Component {
     );
   }
 
+  /**
+   * Get the highlight style class depending on the highlight type.
+   *
+   * @return {object} The matching highlight style class
+   */
   getHighlightClass() {
     const { highlighted, classes } = this.props;
 
@@ -127,12 +142,21 @@ class Day extends React.Component {
     }
   }
 
+  /**
+   * Date selection handler that passes the selected date
+   * to the parent component.
+   */
   handleDaySelection = () => {
     const { date, onSelectDay } = this.props;
 
     onSelectDay(date);
   };
 
+  /**
+   * Render this component.
+   *
+   * @return {jsx} The component markup
+   */
   render() {
     const {
       date, hidden, highlighted, tooltip, classes, theme,
@@ -172,5 +196,5 @@ class Day extends React.Component {
   }
 }
 
-// Export the component
+// Export this component as default
 export default withStyles(styles, { withTheme: true })(Day);

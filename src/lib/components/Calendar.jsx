@@ -1,3 +1,4 @@
+// Library imports
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -8,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 // Local component imports
 import Month from './Month';
 
+// Init moment-range
 const moment = extendMoment(Moment);
 
 /**
@@ -24,12 +26,19 @@ const styles = theme => ({
   },
 });
 
+// Export a helper constant with available calendar types
 export const CALENDAR_TYPE = {
   MONTH: 'month',
   YEAR: 'year',
 };
 
+/**
+ * A component class that creates a calendar.
+ *
+ * @extends React.Component
+ */
 class Calendar extends Component {
+  // Set component property types.
   static propTypes = {
     date: PropTypes.instanceOf(moment),
     onSelect: PropTypes.func,
@@ -44,6 +53,7 @@ class Calendar extends Component {
     onChangeRange: PropTypes.func,
   };
 
+  // Set default property values
   static defaultProps = {
     date: moment(),
     type: CALENDAR_TYPE.MONTH,
@@ -57,13 +67,13 @@ class Calendar extends Component {
     onSelect: () => {},
   };
 
-  state = {
-    visibleRange: moment.range(
-      moment().startOf(CALENDAR_TYPE.MONTH),
-      moment().endOf(CALENDAR_TYPE.MONTH),
-    ),
-  };
-
+  /**
+   * Update the component state with new property values.
+   *
+   * @param {object} nextProps - The new component properties
+   * @param {object} prevState - The previous component state
+   * @return {object} The updated component state
+   */
   static getDerivedStateFromProps(nextProps, prevState) {
     const { date, type, displayMonths } = nextProps;
 
@@ -90,6 +100,18 @@ class Calendar extends Component {
     };
   }
 
+  // Initialise component state
+  state = {
+    visibleRange: moment.range(
+      moment().startOf(CALENDAR_TYPE.MONTH),
+      moment().endOf(CALENDAR_TYPE.MONTH),
+    ),
+  };
+
+  /**
+   * Set the calendar to the previous date range
+   * depending on the calendar type.
+   */
   handlePrevRange = () => {
     const { visibleRange, type } = this.state;
     const { onChangeRange } = this.props;
@@ -109,6 +131,10 @@ class Calendar extends Component {
     onChangeRange(newRange);
   };
 
+  /**
+   * Set the calendar to the next date range
+   * depending on the calendar type.
+   */
   handleNextRange = () => {
     const { visibleRange, type } = this.state;
     const { onChangeRange } = this.props;
@@ -128,6 +154,11 @@ class Calendar extends Component {
     onChangeRange(newRange);
   };
 
+  /**
+   * Date selection handler.
+   *
+   * @param {moment} date - The selected date
+   */
   handleDaySelection = (date) => {
     const { onSelect } = this.props;
 
@@ -186,6 +217,11 @@ class Calendar extends Component {
     });
   }
 
+  /**
+   * Render this component
+   *
+   * @return {jsx} The component markup
+   */
   render() {
     return (
       <Grid container spacing={16}>
@@ -195,4 +231,5 @@ class Calendar extends Component {
   }
 }
 
+// Export this component as default
 export default withStyles(styles, { withTheme: true })(Calendar);

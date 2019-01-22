@@ -1,3 +1,4 @@
+// Library imports
 import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -7,6 +8,7 @@ import {
 } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 
+// Local component imports
 import Calendar from './Calendar';
 
 /**
@@ -36,7 +38,13 @@ const styles = theme => ({
   },
 });
 
+/**
+ * A component class that creates a calendar popover.
+ *
+ * @extends React.PureComponent
+ */
 class PickerPopover extends PureComponent {
+  // Set component property types.
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -47,6 +55,7 @@ class PickerPopover extends PureComponent {
     variant: PropTypes.oneOf(['picker', 'range-picker']),
   };
 
+  // Set default property values
   static defaultProps = {
     anchorEl: null,
     autoSubmit: false,
@@ -54,6 +63,13 @@ class PickerPopover extends PureComponent {
     variant: 'picker',
   };
 
+  /**
+   * Update the component state with new property values.
+   *
+   * @param {object} nextProps - The new component properties
+   * @param {object} prevState - The previous component state
+   * @return {object} The updated component state
+   */
   static getDerivedStateFromProps(nextProps, prevState) {
     const { value } = nextProps;
 
@@ -67,11 +83,18 @@ class PickerPopover extends PureComponent {
     };
   }
 
+  // Initialise component state
   state = {
     startDate: moment().startOf('day'),
     endDate: moment().startOf('day'),
   };
 
+  /**
+   * Date selection handler. Sends the selected date / date range
+   * to the parent component if autoSubmit is true.
+   *
+   * @param {moment} date - The selected date
+   */
   handleDateSelection = (date) => {
     const { autoSubmit, onSubmit, variant } = this.props;
     this.setState(prevState => ({
@@ -84,6 +107,9 @@ class PickerPopover extends PureComponent {
     }
   };
 
+  /**
+   * Submit handler. Sends the selected date to the parent component.
+   */
   handleSubmit = () => {
     const { startDate } = this.state;
     const { onSubmit } = this.props;
@@ -91,6 +117,11 @@ class PickerPopover extends PureComponent {
     onSubmit(startDate);
   };
 
+  /**
+   * Render this component
+   *
+   * @return {jsx} The component markup
+   */
   render() {
     const { startDate, endDate } = this.state;
 
@@ -149,4 +180,5 @@ class PickerPopover extends PureComponent {
   }
 }
 
+// Export this component as default
 export default withStyles(styles, { withTheme: true })(PickerPopover);

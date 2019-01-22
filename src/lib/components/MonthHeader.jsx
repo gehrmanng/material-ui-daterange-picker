@@ -111,5 +111,5 @@ MonthHeader.defaultProps = {
   showYear: true,
 };
 
-// Export the component
+// Export this component as default
 export default withStyles(styles, { withTheme: true })(MonthHeader);
