@@ -3,13 +3,11 @@ import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {
-  Popover, Toolbar, Typography, DialogActions, Button,
-} from '@material-ui/core';
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import { Popover, DialogActions, Button } from '@material-ui/core';
 
 // Local component imports
 import Calendar from './Calendar';
+import PickerHeader from './PickerHeader';
 
 /**
  * Styling classes
@@ -21,20 +19,6 @@ import Calendar from './Calendar';
 const styles = theme => ({
   calendar: {
     padding: theme.spacing.unit * 1.5,
-  },
-  pickerToolbar: {
-    height: theme.spacing.unit * 12.5,
-    backgroundColor: theme.palette.primary.main,
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  year: {
-    color: fade(theme.palette.common.white, 0.54),
-  },
-  date: {
-    color: theme.palette.common.white,
   },
 });
 
@@ -79,14 +63,14 @@ class PickerPopover extends PureComponent {
 
     return {
       startDate: value.startOf('day'),
-      endDate: value.startOf('day'),
+      endDate: null,
     };
   }
 
   // Initialise component state
   state = {
     startDate: moment().startOf('day'),
-    endDate: moment().startOf('day'),
+    endDate: null,
   };
 
   /**
@@ -97,10 +81,27 @@ class PickerPopover extends PureComponent {
    */
   handleDateSelection = (date) => {
     const { autoSubmit, onSubmit, variant } = this.props;
-    this.setState(prevState => ({
-      startDate: variant === 'picker' ? moment(date) : prevState.startDate,
-      endDate: moment(date),
-    }));
+    const { startDate, endDate } = this.state;
+
+    let newStart;
+    let newEnd;
+    if (variant === 'range-picker') {
+      if (endDate || date.isSame(startDate)) {
+        newStart = moment(date);
+        newEnd = null;
+      } else {
+        newStart = date.isBefore(startDate) ? moment(date) : moment(startDate);
+        newEnd = date.isBefore(startDate) ? moment(startDate) : moment(date);
+      }
+    } else {
+      newStart = moment(date);
+      newEnd = null;
+    }
+
+    this.setState({
+      startDate: newStart,
+      endDate: newEnd,
+    });
 
     if (autoSubmit) {
       onSubmit(moment(date));
@@ -126,12 +127,12 @@ class PickerPopover extends PureComponent {
     const { startDate, endDate } = this.state;
 
     const {
-      anchorEl, onClose, autoSubmit, classes,
+      anchorEl, value, onClose, autoSubmit, classes,
     } = this.props;
 
     const open = Boolean(anchorEl);
 
-    const range = moment.range(startDate, endDate);
+    const range = moment.range(startDate, endDate || startDate);
 
     return (
       <Popover
@@ -148,21 +149,14 @@ class PickerPopover extends PureComponent {
           horizontal: 'left',
         }}
       >
-        <Toolbar classes={{ root: classes.pickerToolbar }}>
-          <Typography variant="subtitle1" className={classes.year}>
-            {startDate.format('YYYY')}
-          </Typography>
-          <Typography variant="h4" className={classes.date}>
-            {startDate.format('ddd, MMM DD')}
-          </Typography>
-        </Toolbar>
+        <PickerHeader startDate={startDate} endDate={endDate} />
         <div className={classes.calendar}>
           <Calendar
-            date={startDate}
+            date={value}
             dateRanges={[range]}
             className={classes.pickerCalendar}
             onSelect={this.handleDateSelection}
-            displayMonths={1}
+            displayMonths={2}
           />
         </div>
         {!autoSubmit && (

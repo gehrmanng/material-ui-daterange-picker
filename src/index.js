@@ -16,7 +16,7 @@ const App = () => {
     <div style={{ width: '80%', margin: '0 auto' }}>
       <CssBaseline />
       <h1>Material UI DateRange Picker</h1>
-      <Picker autoSubmit={false} />
+      <Picker autoSubmit={false} variant="range-picker" />
     </div>
   );
 };

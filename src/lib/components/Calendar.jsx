@@ -85,8 +85,8 @@ class Calendar extends Component {
       return null;
     }
 
-    const start = moment(date).startOf(type);
-    const end = moment(date).endOf(type);
+    const start = date ? moment(date).startOf(type) : moment().startOf(type);
+    const end = date ? moment(date).endOf(type) : moment().endOf(type);
 
     if (type === CALENDAR_TYPE.MONTH) {
       end.add(displayMonths - 1, 'months');
