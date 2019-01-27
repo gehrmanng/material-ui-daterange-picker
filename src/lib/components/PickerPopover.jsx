@@ -35,7 +35,7 @@ class PickerPopover extends PureComponent {
     classes: PropTypes.object.isRequired,
     anchorEl: PropTypes.any,
     autoSubmit: PropTypes.bool,
-    value: PropTypes.instanceOf(moment),
+    value: PropTypes.oneOfType([PropTypes.instanceOf(moment), PropTypes.object]),
     variant: PropTypes.oneOf(['picker', 'range-picker']),
   };
 
@@ -55,19 +55,29 @@ class PickerPopover extends PureComponent {
    * @return {object} The updated component state
    */
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { value } = nextProps;
+    const { value, variant, anchorEl } = nextProps;
 
-    if (!value || value.isSame(prevState.startDate, 'day')) {
+    if (!value || !variant || prevState.anchorEl === anchorEl) {
       return null;
     }
 
+    let startDate;
+    let endDate = null;
+    if (variant === 'range-picker' && moment.isRange(value)) {
+      startDate = value.start.startOf('day');
+      endDate = value.end.startOf('day');
+    } else {
+      startDate = value.startOf('day');
+    }
+
     return {
-      startDate: value.startOf('day'),
-      endDate: null,
+      anchorEl,
+      startDate,
+      endDate,
     };
   }
 
-  // Initialise component state
+  // Initial component state
   state = {
     startDate: moment().startOf('day'),
     endDate: null,
@@ -104,7 +114,11 @@ class PickerPopover extends PureComponent {
     });
 
     if (autoSubmit) {
-      onSubmit(moment(date));
+      if (variant === 'range-picker' && newEnd !== null) {
+        onSubmit(moment.range(newStart, newEnd));
+      } else if (variant !== 'range-picker') {
+        onSubmit(newStart);
+      }
     }
   };
 
@@ -112,10 +126,14 @@ class PickerPopover extends PureComponent {
    * Submit handler. Sends the selected date to the parent component.
    */
   handleSubmit = () => {
-    const { startDate } = this.state;
-    const { onSubmit } = this.props;
+    const { startDate, endDate } = this.state;
+    const { onSubmit, variant } = this.props;
 
-    onSubmit(startDate);
+    if (variant === 'range-picker') {
+      onSubmit(moment.range(startDate, endDate));
+    } else {
+      onSubmit(startDate);
+    }
   };
 
   /**
@@ -125,7 +143,6 @@ class PickerPopover extends PureComponent {
    */
   render() {
     const { startDate, endDate } = this.state;
-
     const {
       anchorEl, value, onClose, autoSubmit, classes,
     } = this.props;
@@ -152,7 +169,7 @@ class PickerPopover extends PureComponent {
         <PickerHeader startDate={startDate} endDate={endDate} />
         <div className={classes.calendar}>
           <Calendar
-            date={value}
+            date={moment.isRange(value) ? value.start : value}
             dateRanges={[range]}
             className={classes.pickerCalendar}
             onSelect={this.handleDateSelection}

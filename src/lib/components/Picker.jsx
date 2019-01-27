@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import { TextField } from '@material-ui/core';
-import { fade } from '@material-ui/core/styles/colorManipulator';
 
 // Local component imports
 import PickerPopover from './PickerPopover';
@@ -21,22 +20,8 @@ const moment = extendMoment(Moment);
  * @return {object} An object containing all required styling classes
  */
 const styles = theme => ({
-  calendar: {
-    padding: theme.spacing.unit * 1.5,
-  },
-  pickerToolbar: {
-    height: theme.spacing.unit * 12.5,
-    backgroundColor: theme.palette.primary.main,
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  year: {
-    color: fade(theme.palette.common.white, 0.54),
-  },
-  date: {
-    color: theme.palette.common.white,
+  textField: {
+    minWidth: 200,
   },
 });
 
@@ -48,7 +33,12 @@ const styles = theme => ({
 class Picker extends PureComponent {
   // Set component property types.
   static propTypes = {
-    onSelect: PropTypes.func,
+    value: PropTypes.oneOfType([
+      PropTypes.instanceOf(Date),
+      PropTypes.instanceOf(moment),
+      PropTypes.object,
+    ]),
+    onChange: PropTypes.func,
     classes: PropTypes.object.isRequired,
     variant: PropTypes.oneOf(['inline', 'picker', 'range-picker']),
     autoSubmit: PropTypes.bool,
@@ -56,14 +46,14 @@ class Picker extends PureComponent {
 
   // Set default property values
   static defaultProps = {
-    onSelect: () => {},
+    value: moment(),
+    onChange: () => {},
     variant: 'picker',
     autoSubmit: false,
   };
 
-  // Initialise component state
+  // Initial component state
   state = {
-    textValue: '',
     anchorEl: null,
   };
 
@@ -74,12 +64,24 @@ class Picker extends PureComponent {
    * @param {object} event - The change event
    */
   handleChange = (event) => {
-    const { target } = event;
-    const { value } = target;
+    const { variant, onChange } = this.props;
+    const { value } = event.target;
 
-    this.setState({
-      textValue: value,
-    });
+    if (!value) {
+      onChange();
+    }
+
+    let newValue;
+    if (variant === 'range-picker') {
+      const dateTokens = value.split(' \u2014 ');
+      const startDate = moment(dateTokens[0], 'L');
+      const endDate = dateTokens.length === 2 && moment(dateTokens[1], 'L');
+      newValue = endDate ? moment.range(startDate, endDate) : startDate;
+    } else {
+      newValue = moment(value, 'L');
+    }
+
+    onChange(newValue);
   };
 
   /**
@@ -109,13 +111,16 @@ class Picker extends PureComponent {
    * Handle the selection of a new date. Either by clicking the
    * OK button or by autosubmit. Also closes the popover.
    *
-   * @param {moment} newDate - The selected date
+   * @param {moment|moment.range} newDate - The selected date
    */
   handleConfirm = (newDate) => {
+    const { onChange } = this.props;
+
     this.setState({
-      textValue: newDate.format('L'),
       anchorEl: null,
     });
+
+    onChange(newDate);
   };
 
   /**
@@ -124,10 +129,17 @@ class Picker extends PureComponent {
    * @return {jsx} The component markup
    */
   render() {
-    const { textValue, anchorEl } = this.state;
-    const { variant, autoSubmit, classes } = this.props;
+    const { anchorEl } = this.state;
+    const {
+      value, variant, autoSubmit, classes,
+    } = this.props;
 
-    const dateValue = textValue ? moment(textValue, 'L') : null;
+    let textValue;
+    if (moment.isRange(value)) {
+      textValue = `${value.start.format('L')} \u2014 ${value.end.format('L')}`;
+    } else {
+      textValue = value.format('L');
+    }
 
     return (
       <>
@@ -145,7 +157,7 @@ class Picker extends PureComponent {
           onClose={this.handleClose}
           onSubmit={this.handleConfirm}
           autoSubmit={autoSubmit}
-          value={dateValue}
+          value={value}
           variant={variant}
         />
       </>

@@ -100,7 +100,7 @@ class Calendar extends Component {
     };
   }
 
-  // Initialise component state
+  // Initial component state
   state = {
     visibleRange: moment.range(
       moment().startOf(CALENDAR_TYPE.MONTH),

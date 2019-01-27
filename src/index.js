@@ -1,24 +1,16 @@
 // Library imports
 import React from 'react';
 import { render } from 'react-dom';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import moment from 'moment';
 import 'moment/locale/de';
 
-// Local lib imports
-import Picker from './lib';
+import ExampleApp from './example/ExampleApp';
 
 // Example application
 const App = () => {
   moment.locale(window.navigator.language);
 
-  return (
-    <div style={{ width: '80%', margin: '0 auto' }}>
-      <CssBaseline />
-      <h1>Material UI DateRange Picker</h1>
-      <Picker autoSubmit={false} variant="range-picker" />
-    </div>
-  );
+  return <ExampleApp />;
 };
 
 // Render the example application
