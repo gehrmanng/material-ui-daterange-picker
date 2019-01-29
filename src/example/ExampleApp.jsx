@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
 
 // Local lib imports
@@ -30,9 +31,14 @@ class ExampleApp extends Component {
       <div style={{ width: '80%', margin: '0 auto' }}>
         <CssBaseline />
         <h1>Material-UI date range picker</h1>
-        <Picker autoSubmit={false} value={date} onChange={this.handleChange} variant="picker" />
+        <Picker
+          autoSubmit={false}
+          value={date}
+          onChange={this.handleChange}
+          variant="range-picker"
+        />
         <br />
-        <span>{textValue}</span>
+        <Typography>{textValue}</Typography>
       </div>
     );
   }

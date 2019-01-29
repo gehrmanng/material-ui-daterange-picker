@@ -181,7 +181,7 @@ class Calendar extends Component {
     return Array.from(visibleRange.by('month')).map((m, index) => {
       const monthEnd = moment(m).endOf('month');
       const monthRange = moment.range(m, monthEnd);
-      const ranges = dateRanges.filter(r => monthRange.overlaps(r));
+      const ranges = dateRanges.filter(r => monthRange.overlaps(r, { adjacent: true }));
 
       return (
         <Grid
