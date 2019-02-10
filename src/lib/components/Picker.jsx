@@ -42,6 +42,9 @@ class Picker extends PureComponent {
     classes: PropTypes.object.isRequired,
     variant: PropTypes.oneOf(['inline', 'picker', 'range-picker']),
     autoSubmit: PropTypes.bool,
+    textFieldVariant: PropTypes.string,
+    InputProps: PropTypes.object,
+    fullWidth: PropTypes.bool,
   };
 
   // Set default property values
@@ -50,6 +53,9 @@ class Picker extends PureComponent {
     onChange: () => {},
     variant: 'picker',
     autoSubmit: false,
+    textFieldVariant: 'standard',
+    InputProps: {},
+    fullWidth: false,
   };
 
   // Initial component state
@@ -131,11 +137,11 @@ class Picker extends PureComponent {
   render() {
     const { anchorEl } = this.state;
     const {
-      value, variant, autoSubmit, classes,
+      value, variant, autoSubmit, classes, textFieldVariant, InputProps, fullWidth
     } = this.props;
 
     let textValue;
-    if (moment.isRange(value)) {
+    if (moment.isRange(value) || (value.start && value.end)) {
       textValue = `${value.start.format('L')} \u2014 ${value.end.format('L')}`;
     } else {
       textValue = value.format('L');
@@ -145,12 +151,14 @@ class Picker extends PureComponent {
       <>
         <TextField
           id="date-picker"
-          label="Date"
           className={classes.textField}
           value={textValue}
           onChange={this.handleChange}
           margin="normal"
           onClick={this.handleClickTextfield}
+          variant={textFieldVariant}
+          InputProps={InputProps}
+          fullWidth={fullWidth}
         />
         <PickerPopover
           anchorEl={anchorEl}

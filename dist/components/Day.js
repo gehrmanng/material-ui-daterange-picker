@@ -6,10 +6,10 @@ import _inherits from "@babel/runtime/helpers/esm/inherits";
 // Library imports
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { fade } from '@material-ui/core/styles/colorManipulator';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import moment from 'moment';
+import moment from 'moment'; // Export a helper constant with allowed day highlight types
+
 export var HIGHLIGHT_TYPE = {
   NONE: false,
   IN_RANGE: 'inRange',
@@ -35,13 +35,10 @@ var styles = function styles(theme) {
       width: theme.spacing.unit * 4,
       lineHeight: "".concat(theme.spacing.unit * 4, "px"),
       textAlign: 'center',
-      fontSize: '0.75rem',
-      fontWeight: theme.typography.fontWeightMedium,
-      fontFamily: theme.typography.fontFamily,
       borderRadius: '50%',
       userSelect: 'none',
       '&:hover': {
-        backgroundColor: fade(theme.palette.primary.main, 0.12)
+        backgroundColor: theme.palette.action.hover
       }
     },
     hidden: {
@@ -70,20 +67,20 @@ var styles = function styles(theme) {
       margin: '0 2px 0 0',
       padding: '0 0 0 2px'
     },
-    date: {
-      lineHeight: "".concat(theme.spacing.unit * 4, "px")
+    text: {
+      lineHeight: "".concat(theme.spacing.unit * 4, "px"),
+      fontSize: '0.75rem',
+      fontWeight: theme.typography.fontWeightMedium
     },
     today: {
-      color: theme.palette.secondary.main,
-      lineHeight: "".concat(theme.spacing.unit * 4, "px")
+      color: theme.palette.secondary.main
     }
   };
 };
 /**
- * A functional component that creates a calendar day.
+ * A component class that creates a calendar day.
  *
- * @param {object} props - The component properties
- * @return {jsx} The component markup
+ * @extends React.Component
  */
 
 
@@ -117,6 +114,15 @@ function (_React$Component) {
 
   _createClass(Day, [{
     key: "shouldComponentUpdate",
+
+    /**
+     * Check if the component should be rerendered by comparing
+     * the current properties with the next properties.
+     *
+     * @param {object} nextProps - The next property values
+     * @return {boolean} True if the current and next properties are different
+     *                   thus the component should be rerendered. False otherwise.
+     */
     value: function shouldComponentUpdate(nextProps) {
       var _this$props2 = this.props,
           date = _this$props2.date,
@@ -126,6 +132,12 @@ function (_React$Component) {
           tooltip = _this$props2.tooltip;
       return !date.isSame(nextProps.date, 'day') || hidden !== nextProps.hidden || highlighted !== nextProps.highlighted || highlightColor !== nextProps.highlightColor || tooltip !== nextProps.tooltip;
     }
+    /**
+     * Get the highlight style class depending on the highlight type.
+     *
+     * @return {object} The matching highlight style class
+     */
+
   }, {
     key: "getHighlightClass",
     value: function getHighlightClass() {
@@ -150,25 +162,46 @@ function (_React$Component) {
           return '';
       }
     }
+    /**
+     * Date selection handler that passes the selected date
+     * to the parent component.
+     */
+
   }, {
     key: "render",
+
+    /**
+     * Render this component.
+     *
+     * @return {jsx} The component markup
+     */
     value: function render() {
       var _this$props4 = this.props,
           date = _this$props4.date,
           hidden = _this$props4.hidden,
           highlighted = _this$props4.highlighted,
-          highlightColor = _this$props4.highlightColor,
           tooltip = _this$props4.tooltip,
-          classes = _this$props4.classes;
+          classes = _this$props4.classes,
+          theme = _this$props4.theme;
+      var highlightColor = this.props.highlightColor;
+
+      if (!highlightColor || !highlightColor.length) {
+        highlightColor = theme.palette.primary.main;
+      }
+
       var style;
+      var textStyle;
 
       if (highlighted && !hidden) {
         style = {
           backgroundColor: highlightColor
         };
+        textStyle = {
+          color: theme.palette.getContrastText(highlightColor)
+        };
       }
 
-      var todayClass = date.isSame(moment(), 'day') ? classes.today : classes.date;
+      var textClasses = "".concat(classes.text, " ").concat(date.isSame(moment(), 'day') && classes.today);
       var formattedDate = date.format('D');
       var classNames = "".concat(classes.day, " ").concat(this.getHighlightClass(), " ").concat(hidden && classes.hidden);
       var dayElement = React.createElement("div", {
@@ -179,7 +212,8 @@ function (_React$Component) {
         role: "button",
         onClick: this.handleDaySelection
       }, React.createElement(Typography, {
-        className: todayClass,
+        className: textClasses,
+        style: textStyle,
         component: "span"
       }, formattedDate)));
       return React.createElement(React.Fragment, null, tooltip ? React.createElement(Tooltip, {
@@ -189,7 +223,7 @@ function (_React$Component) {
   }]);
 
   return Day;
-}(React.Component); // Export the component
+}(React.Component); // Export this component as default
 
 
 Day.defaultProps = {

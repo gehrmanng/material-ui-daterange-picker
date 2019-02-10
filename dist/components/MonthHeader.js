@@ -60,7 +60,9 @@ function MonthHeader(props) {
       showLeftArrow = props.showLeftArrow,
       showRightArrow = props.showRightArrow,
       onPrevMonthClick = props.onPrevMonthClick,
-      onNextMonthClick = props.onNextMonthClick;
+      onNextMonthClick = props.onNextMonthClick,
+      showYear = props.showYear;
+  var format = "MMMM".concat(showYear ? ' YYYY' : '');
   var dayNames = [1, 2, 3, 4, 5, 6, 0].map(function (d) {
     return React.createElement("span", {
       key: "dn".concat(d),
@@ -76,7 +78,7 @@ function MonthHeader(props) {
     className: !showLeftArrow ? classes.hidden : ''
   }, React.createElement(Icon, null, "chevron_left")), React.createElement(Typography, {
     component: "span"
-  }, date.format('MMMM')), React.createElement(IconButton, {
+  }, date.format(format)), React.createElement(IconButton, {
     onClick: onNextMonthClick,
     className: !showRightArrow ? classes.hidden : ''
   }, React.createElement(Icon, null, "chevron_right"))), React.createElement("div", {
@@ -88,8 +90,9 @@ function MonthHeader(props) {
 // Set component default properties
 MonthHeader.defaultProps = {
   showLeftArrow: true,
-  showRightArrow: true
-}; // Export the component
+  showRightArrow: true,
+  showYear: true
+}; // Export this component as default
 
 export default withStyles(styles, {
   withTheme: true

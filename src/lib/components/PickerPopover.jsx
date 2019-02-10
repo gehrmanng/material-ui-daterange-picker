@@ -63,7 +63,7 @@ class PickerPopover extends PureComponent {
 
     let startDate;
     let endDate = null;
-    if (variant === 'range-picker' && moment.isRange(value)) {
+    if (variant === 'range-picker' && (moment.isRange(value) || (value.start && value.end))) {
       startDate = value.start.startOf('day');
       endDate = value.end.startOf('day');
     } else {

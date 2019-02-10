@@ -72,6 +72,15 @@ function (_Component) {
 
   _createClass(Month, [{
     key: "shouldComponentUpdate",
+
+    /**
+     * Check if the component should be rerendered by comparing
+     * the current properties with the next properties.
+     *
+     * @param {object} nextProps - The next property values
+     * @return {boolean} True if the current and next properties are different
+     *                   thus the component should be rerendered. False otherwise.
+     */
     value: function shouldComponentUpdate(nextProps) {
       var _this$props = this.props,
           date = _this$props.date,
@@ -93,7 +102,7 @@ function (_Component) {
     /**
      * Render a week with its days.
      *
-     * @param {moment} week The week to be rendered
+     * @param {moment} week - The week to be rendered
      * @return {jsx} The week markup
      */
     value: function renderWeek(week) {
@@ -115,6 +124,15 @@ function (_Component) {
         key: week.toString()
       }, days);
     }
+    /**
+     * Determine various date properties and render that date.
+     *
+     * @param {moment} day - The date to be rendered
+     * @param {moment.range} [range] - A date range that contains the given date. Used for highlighting.
+     * @param {React.Node} [tooltip] - A tooltip to be displayed for this date
+     * @return {jsx} The date markup
+     */
+
   }, {
     key: "renderDay",
     value: function renderDay(day, range, tooltip) {
@@ -188,7 +206,7 @@ function (_Component) {
   }]);
 
   return Month;
-}(Component); // Export the component
+}(Component); // Export this component as default
 
 
 Month.defaultProps = {

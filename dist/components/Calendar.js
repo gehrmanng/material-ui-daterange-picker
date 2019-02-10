@@ -3,13 +3,15 @@ import _createClass from "@babel/runtime/helpers/esm/createClass";
 import _possibleConstructorReturn from "@babel/runtime/helpers/esm/possibleConstructorReturn";
 import _getPrototypeOf from "@babel/runtime/helpers/esm/getPrototypeOf";
 import _inherits from "@babel/runtime/helpers/esm/inherits";
+// Library imports
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import Grid from '@material-ui/core/Grid'; // Local component imports
 
-import Month from './Month';
+import Month from './Month'; // Init moment-range
+
 var moment = extendMoment(Moment);
 /**
  * Styling classes
@@ -26,12 +28,18 @@ var styles = function styles(theme) {
       justifyContent: 'center'
     }
   };
-};
+}; // Export a helper constant with available calendar types
+
 
 export var CALENDAR_TYPE = {
   MONTH: 'month',
   YEAR: 'year'
 };
+/**
+ * A component class that creates a calendar.
+ *
+ * @extends React.Component
+ */
 
 var Calendar =
 /*#__PURE__*/
@@ -86,10 +94,9 @@ function (_Component) {
       onChangeRange(newRange);
     };
 
-    _this.handleDaySelection = function (day, month) {
-      var visibleRange = _this.state.visibleRange;
+    _this.handleDaySelection = function (date) {
       var onSelect = _this.props.onSelect;
-      onSelect(moment([visibleRange.start.year(), month, day]));
+      onSelect(moment(date));
     };
 
     return _this;
@@ -111,24 +118,27 @@ function (_Component) {
           type = _this$state3.type;
       var _this$props = this.props,
           absoluteStartDate = _this$props.absoluteStartDate,
-          absoluteEndDate = _this$props.absoluteEndDate;
+          absoluteEndDate = _this$props.absoluteEndDate,
+          displayMonths = _this$props.displayMonths;
       var _this$props2 = this.props,
           classes = _this$props2.classes,
           dateRanges = _this$props2.dateRanges,
           buildDayTooltip = _this$props2.buildDayTooltip,
           getHighlightColor = _this$props2.getHighlightColor;
-      return Array.from(visibleRange.by('month')).map(function (m) {
+      return Array.from(visibleRange.by('month')).map(function (m, index) {
         var monthEnd = moment(m).endOf('month');
         var monthRange = moment.range(m, monthEnd);
         var ranges = dateRanges.filter(function (r) {
-          return monthRange.overlaps(r);
+          return monthRange.overlaps(r, {
+            adjacent: true
+          });
         });
         return React.createElement(Grid, {
           key: "g".concat(m.format('YYYY-MM-DD')),
           item: true,
           xs: 12,
-          sm: 6,
-          lg: 4,
+          sm: type === CALENDAR_TYPE.MONTH ? 12 / displayMonths : 6,
+          lg: type === CALENDAR_TYPE.MONTH ? 12 / displayMonths : 4,
           classes: {
             item: classes.gridItem
           }
@@ -141,11 +151,17 @@ function (_Component) {
           getHighlightColor: getHighlightColor,
           onPrevMonthClick: _this2.handlePrevRange,
           onNextMonthClick: _this2.handleNextRange,
-          showLeftArrow: type === CALENDAR_TYPE.MONTH && (!absoluteStartDate || absoluteStartDate.isBefore(visibleRange.start)),
-          showRightArrow: type === CALENDAR_TYPE.MONTH && (!absoluteEndDate || absoluteEndDate.isAfter(visibleRange.end))
+          showLeftArrow: type === CALENDAR_TYPE.MONTH && (!absoluteStartDate || absoluteStartDate.isBefore(visibleRange.start)) && index === 0,
+          showRightArrow: type === CALENDAR_TYPE.MONTH && (!absoluteEndDate || absoluteEndDate.isAfter(visibleRange.end)) && index === displayMonths - 1
         }));
       });
     }
+    /**
+     * Render this component
+     *
+     * @return {jsx} The component markup
+     */
+
   }, {
     key: "render",
     value: function render() {
@@ -156,6 +172,14 @@ function (_Component) {
     }
   }], [{
     key: "getDerivedStateFromProps",
+
+    /**
+     * Update the component state with new property values.
+     *
+     * @param {object} nextProps - The new component properties
+     * @param {object} prevState - The previous component state
+     * @return {object} The updated component state
+     */
     value: function getDerivedStateFromProps(nextProps, prevState) {
       var date = nextProps.date,
           type = nextProps.type,
@@ -165,8 +189,8 @@ function (_Component) {
         return null;
       }
 
-      var start = moment(date).startOf(type);
-      var end = moment(date).endOf(type);
+      var start = date ? moment(date).startOf(type) : moment().startOf(type);
+      var end = date ? moment(date).endOf(type) : moment().endOf(type);
 
       if (type === CALENDAR_TYPE.MONTH) {
         end.add(displayMonths - 1, 'months');
@@ -178,13 +202,16 @@ function (_Component) {
         type: type,
         displayMonths: displayMonths
       };
-    }
+    } // Initial component state
+
   }]);
 
   return Calendar;
-}(Component);
+}(Component); // Export this component as default
+
 
 Calendar.defaultProps = {
+  date: moment(),
   type: CALENDAR_TYPE.MONTH,
   displayMonths: 1,
   dateRanges: [],
@@ -196,7 +223,8 @@ Calendar.defaultProps = {
   getHighlightColor: function getHighlightColor() {
     return undefined;
   },
-  onChangeRange: function onChangeRange() {}
+  onChangeRange: function onChangeRange() {},
+  onSelect: function onSelect() {}
 };
 export default withStyles(styles, {
   withTheme: true
